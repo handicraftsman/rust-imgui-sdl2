@@ -12,6 +12,20 @@ use std::os::raw::{c_char, c_void};
 
 use sdl2::event::Event;
 
+pub const NOMOD: u16 = 0x0000;
+pub const LSHIFTMOD: u16 = 0x0001;
+pub const RSHIFTMOD: u16 = 0x0002;
+pub const LCTRLMOD: u16 = 0x0040;
+pub const RCTRLMOD: u16 = 0x0080;
+pub const LALTMOD: u16 = 0x0100;
+pub const RALTMOD: u16 = 0x0200;
+pub const LGUIMOD: u16 = 0x0400;
+pub const RGUIMOD: u16 = 0x0800;
+pub const NUMMOD: u16 = 0x1000;
+pub const CAPSMOD: u16 = 0x2000;
+pub const MODEMOD: u16 = 0x4000;
+pub const RESERVEDMOD: u16 = 0x8000;
+
 pub struct ImguiSdl2 {
   last_frame: Instant,
   mouse_press: [bool; 5],
@@ -101,10 +115,10 @@ impl ImguiSdl2 {
     use sdl2::keyboard;
 
     fn set_mod(imgui: &mut ImGui, keymod: keyboard::Mod) {
-      let ctrl = keymod.intersects(keyboard::Mod::RCTRLMOD | keyboard::Mod::LCTRLMOD);
-      let alt = keymod.intersects(keyboard::Mod::RALTMOD | keyboard::Mod::LALTMOD);
-      let shift = keymod.intersects(keyboard::Mod::RSHIFTMOD | keyboard::Mod::LSHIFTMOD);
-      let super_ = keymod.intersects(keyboard::Mod::RGUIMOD | keyboard::Mod::LGUIMOD);
+      let ctrl = keymod.intersects(keyboard::Mod::from_bits_truncate(RCTRLMOD) | keyboard::Mod::from_bits_truncate(LCTRLMOD));
+      let alt = keymod.intersects(keyboard::Mod::from_bits_truncate(RALTMOD) | keyboard::Mod::from_bits_truncate(LALTMOD));
+      let shift = keymod.intersects(keyboard::Mod::from_bits_truncate(RSHIFTMOD) | keyboard::Mod::from_bits_truncate(LSHIFTMOD));
+      let super_ = keymod.intersects(keyboard::Mod::from_bits_truncate(RGUIMOD) | keyboard::Mod::from_bits_truncate(LGUIMOD));
 
       imgui.set_key_ctrl(ctrl);
       imgui.set_key_alt(alt);
@@ -235,7 +249,7 @@ pub extern "C" fn get_clipboard_text(_user_data: *mut c_void) -> *const c_char {
 }
 
 #[doc(hidden)]
-#[cfg_attr(feature = "cargo-clippy", allow(not_unsafe_ptr_arg_deref))]
+#[cfg_attr(feature = "cargo-clippy", allow(clippy::not_unsafe_ptr_arg_deref))]
 pub extern "C" fn set_clipboard_text(_user_data: *mut c_void, text: *const c_char) {
   unsafe { sdl2_sys::SDL_SetClipboardText(text) };
 }
